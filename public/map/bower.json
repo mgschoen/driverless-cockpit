@@ -3,7 +3,10 @@
   "description": "Map visualisation for MunichMotorsport&#39;s FSD vehicle",
   "main": "index.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^2.0.0"
+    "polymer": "Polymer/polymer#^2.0.0",
+    "app-layout": "PolymerElements/app-layout#^2.0.4",
+    "paper-toolbar": "PolymerElements/paper-toolbar#^2.0.0",
+    "paper-progress": "PolymerElements/paper-progress#^2.0.1"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
