@@ -14,6 +14,15 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+// initialise vehicle mock
+var VehicleMock = require('./bin/vehicle-mock');
+if (process.env.FSD_MOCKDATA_PATH) {
+  app.set('vehicle', new VehicleMock(process.env.FSD_MOCKDATA_PATH));
+} else {
+  throw new Error('Please specify source path to vehicle mock data in ' +
+      'FSD_MOCKDATA_PATH environment variable');
+}
+
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
