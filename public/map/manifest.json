@@ -1,0 +1,7 @@
+{
+  "name": "fsd-map",
+  "short_name": "fsd-map",
+  "description": "Map visualisation for MunichMotorsport&#39;s FSD vehicle",
+  "start_url": "/",
+  "display": "standalone"
+}
