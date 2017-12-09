@@ -1,17 +1,40 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<!-- Layout imports -->
 <link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<!-- Library components -->
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/editor-icons.html">
+<link rel="import" href="../../bower_components/iron-image/iron-image.html">
+
+<!-- Custom components -->
 
 <dom-module id="fsd-map-app">
   <template>
-    <style>
+    <style include="typography"></style>
+    <style include="app-grid-style">
       :host {
-        display: block;
+
+        /* Color definitions */
         --app-primary-color: rgba(50,50,50,1);
+        --app-background-color: rgba(204,204,204,1);
         --app-lighttext-color: rgba(255,255,255,1);
-        --app-highlight-color: #be1621;
+        --app-highlight-color: rgba(190,22,33,1);
+
+        /* Grid config */
+        --app-grid-columns: 3;
+        --app-grid-expandible-item-columns: 3;
+        --app-grid-gutter: 20px;
+
+        /* Fonts */
         font-family: 'Roboto', Arial, sans-serif;
       }
 
@@ -28,18 +51,90 @@
         --paper-progress-active-color: var(--app-highlight-color);
       }
 
-      app-toolbar.spacer {}
+      paper-card {
+        width: 100%;
+      }
+
+      paper-card.dashboard-box {
+        --paper-card-background-color: var(--app-primary-color);
+        --paper-card-header-color: var(--app-lighttext-color);
+        --paper-card-content: {
+          color: var(--app-lighttext-color);
+        }
+      }
+
+      .dashboard-box-header {
+        @apply (--paper-font-headline);
+      }
+
+      .content {
+        margin: auto 10px;
+      }
+
+      .map {
+        @apply --app-grid-expandible-item;
+        height: 500px;
+        background: var(--app-background-color);
+      }
+
+      #logo {
+        background: var(--app-primary-color);
+        display: inline-block;
+        --iron-image-height: 60px;
+      }
+
+      #main-title {
+        margin-left: 10px;
+        vertical-align: 80%;
+      }
     </style>
 
+    <!-- App header -->
     <app-toolbar class="title-toolbar nav-title-toolbar spacer"></app-toolbar>
-
     <app-toolbar class="title-toolbar nav-title-toolbar main">
-      <div main-title>Title</div>
-      <paper-progress value="10" indeterminate bottom-item></paper-progress>
+      <div main-title>
+        <iron-image id="logo" src="/static/hm-logo.png" preload fade></iron-image>
+        <span id="main-title">Cockpit</span>
+      </div>
+      <paper-progress value="0" indeterminate="{{false}}" bottom-item></paper-progress>
     </app-toolbar>
 
-    <h2>Hello [[prop1]]!</h2>
-    <div style="height:2000px; background: #808080;">sdf</div>
+    <!-- App content -->
+    <div class="app-grid">
+
+      <!-- 1st row -->
+      <div class="map">map</div>
+
+      <!-- 2nd row -->
+      <div id="stats">
+        <paper-card class="dashboard-box">
+          <div class="card-content">
+            <div class="dashboard-box-header">
+              <iron-icon icon="editor:insert-chart"></iron-icon>
+              Stats
+            </div>
+            <pre>
+sdf
+abc
+def
+          </pre>
+          </div>
+        </paper-card>
+      </div>
+
+      <div id="settings">
+        <paper-card class="dashboard-box">
+          <div class="card-content">
+            <div class="dashboard-box-header">
+              <iron-icon icon="build"></iron-icon>
+              Settings
+            </div>
+          </div>
+        </paper-card>
+      </div>
+
+      <div id="other"></div>
+    </div>
   </template>
 
   <script>
