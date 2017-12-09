@@ -38,7 +38,6 @@ class VehicleMock {
         this.pathMiddleY = parseFloat(dataArray[3]);
         this.vehicleX = parseFloat(dataArray[4]);
         this.vehicleY = parseFloat(dataArray[5]);
-        this.printStatus();
         setTimeout(() => {
             this.nextLine();
         }, 100);
