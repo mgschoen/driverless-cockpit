@@ -6,6 +6,9 @@
 <link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 
+<!-- App logic -->
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
 <!-- Library components -->
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
@@ -89,6 +92,13 @@
       }
     </style>
 
+    <!-- Ajax controller -->
+    <iron-ajax id="vehiclestatsRequest"
+               auto url="/vehiclestats"
+               handle-as="json"
+               on-response="handleVehiclestats"
+               last-response="{{ajaxResponse}}"></iron-ajax>
+
     <!-- App header -->
     <app-toolbar class="title-toolbar nav-title-toolbar spacer"></app-toolbar>
     <app-toolbar class="title-toolbar nav-title-toolbar main">
@@ -114,9 +124,11 @@
               Stats
             </div>
             <pre>
-sdf
-abc
-def
+steerAngle: {{steerAngle}}
+pathMiddleX: {{pathMiddleX}}
+pathMiddleY: {{pathMiddleY}}
+vehicleX: {{vehicleX}}
+vehicleY: {{vehicleY}}
           </pre>
           </div>
         </paper-card>
@@ -146,11 +158,48 @@ def
       static get is() { return 'fsd-map-app'; }
       static get properties() {
         return {
-          prop1: {
-            type: String,
-            value: 'fsd-map-app'
+          steerAngle: {
+            type: Number,
+            value: 0.0
+          },
+          pathMiddleX: {
+            type: Number,
+            value: 0.0
+          },
+          pathMiddleY: {
+            type: Number,
+            value: 0.0
+          },
+          vehicleX: {
+            type: Number,
+            value: 0.0
+          },
+          vehicleY: {
+            type: Number,
+            value: 0.0
+          },
+          ajaxResponse: {
+            type: Object
           }
         };
+      }
+
+      handleVehiclestats (e) {
+
+        if (e.type !== 'response') {
+          throw new Error('Failed to get vehicle statistics from server');
+        } else {
+          var res = this.ajaxResponse;
+          this.steerAngle = res.steerAngle;
+          this.pathMiddleX = res.pathMiddleX;
+          this.pathMiddleY = res.pathMiddleY;
+          this.vehicleX = res.vehicleX;
+          this.vehicleY = res.vehicleY;
+          var root = this.shadowRoot;
+          setTimeout(function(){
+            root.querySelector('#vehiclestatsRequest').generateRequest();
+          }, 500)
+        }
       }
     }
 
