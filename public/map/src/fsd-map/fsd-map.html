@@ -150,6 +150,22 @@
             }
           }
         }
+
+        // if vehicle focus on, move camera
+        if (this.focusVehicle) {
+          let scale = this.zui.scale;
+          let canvas = new Two.Vector(this.twoApp.width, this.twoApp.height);
+          let absoluteCarpos = this.shapeVehicle.translation;
+          let onscreenCarpos = new Two.Vector(absoluteCarpos.x * scale, absoluteCarpos.y * scale);
+          let camTranslation = this.zui.surfaces[0].object.translation;
+          let onscreenCampos = new Two.Vector(-camTranslation.x, -camTranslation.y);
+          let onscreenCamFocus = new Two.Vector(onscreenCampos.x + canvas.x/2,
+                                                onscreenCampos.y + canvas.y/2);
+          let onscreenDist = new Two.Vector(onscreenCarpos.x - onscreenCamFocus.x,
+                                            onscreenCarpos.y - onscreenCamFocus.y);
+          this.zui.translateSurface(-onscreenDist.x, -onscreenDist.y);
+          this.zui.updateSurface();
+        }
       }
 
       _performZoom (e) {
