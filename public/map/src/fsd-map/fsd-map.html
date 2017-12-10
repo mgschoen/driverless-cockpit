@@ -46,8 +46,17 @@
 
           // view controls
           dragActive: { type: Boolean, value: false },
-          __dragListenerFunction: { type: Object }
+          __dragListenerFunction: { type: Object },
+          showVehicle: { type: Boolean },
+          showTrack: { type: Boolean },
+          showMiddlePath: { type: Boolean }
         };
+      }
+
+      static get observers() {
+        return [
+          '_showParametersChanged(showVehicle, showTrack, showMiddlePath)'
+        ];
       }
 
       ready() {
@@ -153,6 +162,18 @@
       _dragStep (e) {
         this.zui.translateSurface(e.movementX, e.movementY);
         this.zui.updateSurface();
+      }
+
+      _showParametersChanged (showVehicle, showTrack, showMiddlePath) {
+        if (this.shapeVehicle) {
+          this.shapeVehicle.opacity = (showVehicle) ? 1 : 0;
+        }
+        if (this.shapeTrack) {
+          this.shapeTrack.opacity = (showTrack) ? 1 : 0;
+        }
+        if (this.shapeMiddlePath) {
+          this.shapeMiddlePath.opacity = (showMiddlePath) ? 1 : 0;
+        }
       }
     }
 

@@ -24,13 +24,13 @@
           Settings
         </div>
         <p>
-          <paper-checkbox checked="{{drawVehicle}}">Show vehicle</paper-checkbox>
+          <paper-checkbox checked="{{showVehicle}}">Show vehicle</paper-checkbox>
         </p>
         <p>
-          <paper-checkbox checked="{{drawTrack}}">Show driven track</paper-checkbox>
+          <paper-checkbox checked="{{showTrack}}">Show driven track</paper-checkbox>
         </p>
         <p>
-          <paper-checkbox checked="{{drawMiddlePath}}">Show middle path</paper-checkbox>
+          <paper-checkbox checked="{{showMiddlePath}}">Show middle path</paper-checkbox>
         </p>
       </div>
     </paper-card>
@@ -49,10 +49,11 @@
 
       static get properties() {
         return {
-          prop1: {
-            type: Number,
-            value: 0.0
-          }
+
+          showVehicle: { type: Boolean, notify: true },
+          showTrack: { type: Boolean, notify: true },
+          showMiddlePath: { type: Boolean, notify: true }
+
         };
       }
 

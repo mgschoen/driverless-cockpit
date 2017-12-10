@@ -98,7 +98,10 @@
                  path-middle-x="[[pathMiddleX]]"
                  path-middle-y="[[pathMiddleY]]"
                  vehicle-x="[[vehicleX]]"
-                 vehicle-y="[[vehicleY]]"></fsd-map>
+                 vehicle-y="[[vehicleY]]"
+                 show-vehicle="[[showVehicle]]"
+                 show-track="[[showTrack]]"
+                 show-middle-path="[[showMiddlePath]]"></fsd-map>
       </div>
 
       <!-- 2nd row -->
@@ -114,9 +117,9 @@
 
       <div id="settings">
         <!-- Dashboard box settings -->
-        <fsd-dashboard-settings draw-vehicle="{{drawVehicle}}"
-                                draw-track="{{drawTrack}}"
-                                draw-middle-path="{{drawMiddlePath}}"></fsd-dashboard-settings>
+        <fsd-dashboard-settings show-vehicle="{{showVehicle}}"
+                                show-track="{{showTrack}}"
+                                show-middle-path="{{showMiddlePath}}"></fsd-dashboard-settings>
       </div>
 
       <div id="other"></div>
@@ -144,9 +147,9 @@
           ajaxResponse: { type: Object },
 
           // settings
-          drawVehicle: { type: Boolean, value: true },
-          drawTrack: { type: Boolean, value: true },
-          drawMiddlePath: { type: Boolean, value: true }
+          showVehicle: { type: Boolean, value: true },
+          showTrack: { type: Boolean, value: true },
+          showMiddlePath: { type: Boolean, value: true }
         };
       }
 
