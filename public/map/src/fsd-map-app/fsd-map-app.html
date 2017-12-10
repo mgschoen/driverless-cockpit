@@ -19,6 +19,7 @@
 <link rel="import" href="../../bower_components/iron-image/iron-image.html">
 
 <!-- Custom components -->
+<link rel="import" href="../fsd-map/fsd-map.html">
 
 <dom-module id="fsd-map-app">
   <template>
@@ -76,7 +77,6 @@
 
       .map {
         @apply --app-grid-expandible-item;
-        height: 500px;
         background: var(--app-background-color);
       }
 
@@ -113,7 +113,13 @@
     <div class="app-grid">
 
       <!-- 1st row -->
-      <div class="map">map</div>
+      <div class="map">
+        <fsd-map steer-angle="[[steerAngle]]"
+                 path-middle-x="[[pathMiddleX]]"
+                 path-middle-y="[[pathMiddleY]]"
+                 vehicle-x="[[vehicleX]]"
+                 vehicle-y="[[vehicleY]]"></fsd-map>
+      </div>
 
       <!-- 2nd row -->
       <div id="stats">
@@ -184,6 +190,10 @@ vehicleY: {{vehicleY}}
         };
       }
 
+      /**
+       * React to iron-ajax' response event on /vehiclestats
+       * @param e - event
+       */
       handleVehiclestats (e) {
 
         if (e.type !== 'response') {
@@ -195,7 +205,9 @@ vehicleY: {{vehicleY}}
           this.pathMiddleY = res.pathMiddleY;
           this.vehicleX = res.vehicleX;
           this.vehicleY = res.vehicleY;
+
           var root = this.shadowRoot;
+          root.querySelector('fsd-map').updateView();
           setTimeout(function(){
             root.querySelector('#vehiclestatsRequest').generateRequest();
           }, 500)

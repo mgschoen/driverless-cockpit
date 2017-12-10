@@ -1,0 +1,119 @@
+<link rel="import" href="./fsd-map-imports.html">
+
+<dom-module id="fsd-map">
+  <template>
+    <style>
+
+      :host {
+        display: block;
+        height: 500px;
+      }
+
+    </style>
+
+    <div id="canvas"></div>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class fsdMap extends Polymer.Element {
+      static get is() {
+        return 'fsd-map';
+      }
+
+      static get properties() {
+        return {
+          // Lifecycle check
+          componentReady: { type: Boolean, value: false },
+
+          // vehicle data
+          steerAngle: { type: Number, value: 0.0 },
+          pathMiddleX: { type: Number, value: 0.0 },
+          pathMiddleY: { type: Number, value: 0.0 },
+          vehicleX: { type: Number, value: 0.0 },
+          vehicleY: { type: Number, value: 0.0 },
+
+          // render objects
+          twoApp: { type: Object },
+          shapeVehicle: { type: Object },
+          shapeTrack: { type: Object },
+          shapeMiddlePath: { type: Object }
+        };
+      }
+
+      ready() {
+        super.ready();
+
+        // Initialise Two.js app
+        var canvas = this.shadowRoot.querySelector('#canvas');
+        this.twoApp = new Two({
+          width: this.offsetWidth,
+          height: 500
+        }).appendTo(canvas);
+
+        // Create objects for drawing
+
+        // vehicle
+        this.shapeVehicle = this.twoApp.makeCircle(0, 0, 4);
+        this.shapeVehicle.fill = '#ff0000';
+
+        // vehicle track
+        let anchor = new Two.Anchor(0, 0);
+        this.shapeTrack = this.twoApp.makePath([anchor], true);
+        this.shapeTrack.noFill();
+
+        // middle path
+        this.shapeMiddlePath = this.twoApp.makePath([anchor], true);
+        this.shapeMiddlePath.noFill();
+        this.shapeMiddlePath.stroke = '#0000ff';
+
+        // start animation loop
+        this.twoApp.play();
+      }
+
+      updateView () {
+
+        // move vehicle
+        if (this.shapeVehicle) {
+          this.shapeVehicle.translation.x = this.vehicleX;
+          this.shapeVehicle.translation.y = this.vehicleY;
+        }
+
+        // draw vehicle track
+        if (this.shapeTrack) {
+          let anchor = new Two.Anchor(this.vehicleX, this.vehicleY);
+          this.shapeTrack.vertices.push(anchor);
+
+          // when second vertex is added, remove origin
+          if (this.shapeTrack.vertices.length === 2) {
+            var firstVertex = this.shapeTrack.vertices[0];
+            if (firstVertex.x === 0 && firstVertex.y === 0) {
+              this.shapeTrack.vertices.shift();
+            }
+          }
+        }
+
+        // draw middle path
+        if (this.shapeMiddlePath) {
+          let anchor = new Two.Anchor(this.pathMiddleX, this.pathMiddleY);
+          this.shapeMiddlePath.vertices.push(anchor);
+
+          // when second vertex is added, remove origin
+          if (this.shapeMiddlePath.vertices.length === 2) {
+            var firstVertex = this.shapeMiddlePath.vertices[0];
+            if (firstVertex.x === 0 && firstVertex.y === 0) {
+              this.shapeMiddlePath.vertices.shift();
+            }
+          }
+        }
+      }
+
+    }
+
+    window.customElements.define(fsdMap.is, fsdMap);
+  </script>
+</dom-module>
