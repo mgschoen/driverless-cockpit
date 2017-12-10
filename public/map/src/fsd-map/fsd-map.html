@@ -39,6 +39,7 @@
 
           // render objects
           twoApp: { type: Object },
+          zui: { type: Object },
           shapeVehicle: { type: Object },
           shapeTrack: { type: Object },
           shapeMiddlePath: { type: Object }
@@ -55,21 +56,25 @@
           height: 500
         }).appendTo(canvas);
 
-        // Create objects for drawing
-
-        // vehicle
+        // draw vehicle
         this.shapeVehicle = this.twoApp.makeCircle(0, 0, 4);
         this.shapeVehicle.fill = '#ff0000';
 
-        // vehicle track
+        // draw vehicle track
         let anchor = new Two.Anchor(0, 0);
         this.shapeTrack = this.twoApp.makePath([anchor], true);
         this.shapeTrack.noFill();
 
-        // middle path
+        // draw middle path
         this.shapeMiddlePath = this.twoApp.makePath([anchor], true);
         this.shapeMiddlePath.noFill();
         this.shapeMiddlePath.stroke = '#0000ff';
+
+        // add zoomable UI
+        this.zui = new ZUI(this.twoApp);
+        this.zui.addLimits(0.06, 8);
+        this.twoApp.renderer.domElement.addEventListener('mousewheel', this._performZoom.bind(this));
+        this.twoApp.renderer.domElement.addEventListener('wheel', this._performZoom.bind(this));
 
         // start animation loop
         this.twoApp.play();
@@ -112,6 +117,14 @@
         }
       }
 
+      _performZoom (e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        var dy = (e.wheelDeltaY || -e.deltaY) / 1000;
+
+        this.zui.zoomBy(dy, e.clientX, e.clientY);
+      }
     }
 
     window.customElements.define(fsdMap.is, fsdMap);
