@@ -42,7 +42,11 @@
           zui: { type: Object },
           shapeVehicle: { type: Object },
           shapeTrack: { type: Object },
-          shapeMiddlePath: { type: Object }
+          shapeMiddlePath: { type: Object },
+
+          // view controls
+          dragActive: { type: Boolean, value: false },
+          __dragListenerFunction: { type: Object }
         };
       }
 
@@ -75,6 +79,12 @@
         this.zui.addLimits(0.06, 8);
         this.twoApp.renderer.domElement.addEventListener('mousewheel', this._performZoom.bind(this));
         this.twoApp.renderer.domElement.addEventListener('wheel', this._performZoom.bind(this));
+
+        // add drag listeners
+        this.twoApp.renderer.domElement.addEventListener('mousedown', this._startDrag.bind(this));
+        this.twoApp.renderer.domElement.addEventListener('mouseup', this._stopDrag.bind(this));
+        this.twoApp.renderer.domElement.addEventListener('mouseleave', this._stopDrag.bind(this));
+        this.__dragListenerFunction = this._dragStep.bind(this);
 
         // start animation loop
         this.twoApp.play();
@@ -124,6 +134,25 @@
         var dy = (e.wheelDeltaY || -e.deltaY) / 1000;
 
         this.zui.zoomBy(dy, e.clientX, e.clientY);
+      }
+
+      _startDrag (e) {
+        if (!this.dragActive) {
+          this.dragActive = true;
+          this.twoApp.renderer.domElement.addEventListener('mousemove', this.__dragListenerFunction);
+        }
+      }
+
+      _stopDrag (e) {
+        if (this.dragActive) {
+          this.dragActive = false;
+          this.twoApp.renderer.domElement.removeEventListener('mousemove', this.__dragListenerFunction);
+        }
+      }
+
+      _dragStep (e) {
+        this.zui.translateSurface(e.movementX, e.movementY);
+        this.zui.updateSurface();
       }
     }
 
