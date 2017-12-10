@@ -113,6 +113,11 @@
 
         // start animation loop
         this.twoApp.play();
+
+        // resize listener
+        window.addEventListener('resize', function () {
+          this.twoApp.width = this.offsetWidth;
+        }.bind(this));
       }
 
       updateView () {

@@ -70,6 +70,24 @@
         margin-left: 10px;
         vertical-align: 80%;
       }
+
+      @media (max-width: 800px) {
+
+        :host {
+          --app-grid-columns: 2;
+          --app-grid-expandible-item-columns: 2;
+          --app-grid-gutter: 20px;
+        }
+      }
+
+      @media (max-width: 550px) {
+
+        :host {
+          --app-grid-columns: 1;
+          --app-grid-expandible-item-columns: 1;
+          --app-grid-gutter: 20px;
+        }
+      }
     </style>
 
     <!-- Ajax controller -->
