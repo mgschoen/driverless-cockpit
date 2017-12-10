@@ -1,0 +1,65 @@
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+
+<link rel="import" href="../fsd-shared/fsd-shared-styles.html">
+<link rel="import" href="./fsd-dashboard-imports.html">
+<link rel="import" href="./fsd-dashboard-shared-styles.html">
+
+<dom-module id="fsd-dashboard-settings">
+  <template>
+    <style include="fsd-shared-styles"></style>
+    <style include="fsd-dashboard-shared-styles">
+
+      paper-checkbox {
+        --paper-checkbox-label-color: var(--app-lighttext-color);
+        --paper-checkbox-unchecked-color: var(--app-lighttext-color);
+        --paper-checkbox-checked-color: var(--app-highlight-color);
+      }
+
+    </style>
+
+    <paper-card class="dashboard-box">
+      <div class="card-content">
+        <div class="dashboard-box-header">
+          <iron-icon icon="build"></iron-icon>
+          Settings
+        </div>
+        <p>
+          <paper-checkbox checked="{{drawVehicle}}">Show vehicle</paper-checkbox>
+        </p>
+        <p>
+          <paper-checkbox checked="{{drawTrack}}">Show driven track</paper-checkbox>
+        </p>
+        <p>
+          <paper-checkbox checked="{{drawMiddlePath}}">Show middle path</paper-checkbox>
+        </p>
+      </div>
+    </paper-card>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class fsdDashboardSettings extends Polymer.Element {
+      static get is() {
+        return 'fsd-dashboard-settings';
+      }
+
+      static get properties() {
+        return {
+          prop1: {
+            type: Number,
+            value: 0.0
+          }
+        };
+      }
+
+      // class methods go here
+
+    }
+
+    window.customElements.define(fsdDashboardSettings.is, fsdDashboardSettings);
+  </script>
+</dom-module>

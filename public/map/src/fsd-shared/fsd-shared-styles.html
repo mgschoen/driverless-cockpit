@@ -1,0 +1,36 @@
+<dom-module id="fsd-shared-styles">
+  <template>
+    <style>
+
+      :host {
+        /* Color definitions */
+        --app-primary-color: rgba(50,50,50,1);
+        --app-background-color: rgba(204,204,204,1);
+        --app-lighttext-color: rgba(255,255,255,1);
+        --app-highlight-color: rgba(190,22,33,1);
+
+        /* Fonts */
+        font-family: 'Roboto', Arial, sans-serif;
+      }
+
+    </style>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class fsdSharedStyles extends Polymer.Element {
+      static get is() {
+        return 'fsd-shared-styles';
+      }
+
+      static get properties() {
+        return {};
+      }
+    }
+
+    window.customElements.define(fsdSharedStyles.is, fsdSharedStyles);
+  </script>
+</dom-module>

@@ -1,0 +1,57 @@
+<link rel="import" href="./fsd-dashboard-imports.html">
+<link rel="import" href="./fsd-dashboard-shared-styles.html">
+
+<dom-module id="fsd-dashboard-stats">
+  <template>
+    <style include="fsd-dashboard-shared-styles">
+
+      :host {
+        display: block;
+      }
+
+    </style>
+
+    <paper-card class="dashboard-box">
+      <div class="card-content">
+        <div class="dashboard-box-header">
+          <iron-icon icon="editor:insert-chart"></iron-icon>
+          Stats
+        </div>
+            <pre>
+steerAngle: {{steerAngle}}
+pathMiddleX: {{pathMiddleX}}
+pathMiddleY: {{pathMiddleY}}
+vehicleX: {{vehicleX}}
+vehicleY: {{vehicleY}}
+          </pre>
+      </div>
+    </paper-card>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class fsdDashboardStats extends Polymer.Element {
+      static get is() {
+        return 'fsd-dashboard-stats';
+      }
+
+      static get properties() {
+        return {
+          prop1: {
+            type: Number,
+            value: 0.0
+          }
+        };
+      }
+
+      // class methods go here
+
+    }
+
+    window.customElements.define(fsdDashboardStats.is, fsdDashboardStats);
+  </script>
+</dom-module>

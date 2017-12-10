@@ -1,0 +1,43 @@
+<dom-module id="fsd-dashboard-shared-styles">
+  <template>
+    <style>
+
+      paper-card {
+        width: 100%;
+      }
+
+      paper-card.dashboard-box {
+        --paper-card-background-color: var(--app-primary-color);
+        --paper-card-header-color: var(--app-lighttext-color);
+        --paper-card-content: {
+          color: var(--app-lighttext-color);
+        }
+      }
+
+      .dashboard-box-header {
+        @apply (--paper-font-headline);
+      }
+
+    </style>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class fsdDashboardSharedStyles extends Polymer.Element {
+      static get is() {
+        return 'fsd-dashboard-shared-styles';
+      }
+
+      static get properties() {
+        return {};
+      }
+
+    }
+
+    window.customElements.define(fsdDashboardSharedStyles.is, fsdDashboardSharedStyles);
+  </script>
+</dom-module>

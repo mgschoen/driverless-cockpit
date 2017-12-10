@@ -19,27 +19,23 @@
 <link rel="import" href="../../bower_components/iron-image/iron-image.html">
 
 <!-- Custom components -->
+<link rel="import" href="../fsd-shared/fsd-shared-styles.html">
 <link rel="import" href="../fsd-map/fsd-map.html">
+<link rel="import" href="../fsd-dashboard/fsd-dashboard-stats.html">
+<link rel="import" href="../fsd-dashboard/fsd-dashboard-settings.html">
 
 <dom-module id="fsd-map-app">
   <template>
     <style include="typography"></style>
-    <style include="app-grid-style">
+    <style include="app-grid-style"></style>
+    <style include="fsd-shared-styles">
       :host {
-
-        /* Color definitions */
-        --app-primary-color: rgba(50,50,50,1);
-        --app-background-color: rgba(204,204,204,1);
-        --app-lighttext-color: rgba(255,255,255,1);
-        --app-highlight-color: rgba(190,22,33,1);
 
         /* Grid config */
         --app-grid-columns: 3;
         --app-grid-expandible-item-columns: 3;
         --app-grid-gutter: 20px;
 
-        /* Fonts */
-        font-family: 'Roboto', Arial, sans-serif;
       }
 
       app-toolbar.main {
@@ -53,22 +49,6 @@
       app-toolbar paper-progress {
         width: 100%;
         --paper-progress-active-color: var(--app-highlight-color);
-      }
-
-      paper-card {
-        width: 100%;
-      }
-
-      paper-card.dashboard-box {
-        --paper-card-background-color: var(--app-primary-color);
-        --paper-card-header-color: var(--app-lighttext-color);
-        --paper-card-content: {
-          color: var(--app-lighttext-color);
-        }
-      }
-
-      .dashboard-box-header {
-        @apply (--paper-font-headline);
       }
 
       .content {
@@ -123,32 +103,20 @@
 
       <!-- 2nd row -->
       <div id="stats">
-        <paper-card class="dashboard-box">
-          <div class="card-content">
-            <div class="dashboard-box-header">
-              <iron-icon icon="editor:insert-chart"></iron-icon>
-              Stats
-            </div>
-            <pre>
-steerAngle: {{steerAngle}}
-pathMiddleX: {{pathMiddleX}}
-pathMiddleY: {{pathMiddleY}}
-vehicleX: {{vehicleX}}
-vehicleY: {{vehicleY}}
-          </pre>
-          </div>
-        </paper-card>
+
+        <!-- Dashboard box statistics -->
+        <fsd-dashboard-stats steer-angle="[[steerAngle]]"
+                             path-middle-x="[[pathMiddleX]]"
+                             path-middle-y="[[pathMiddleY]]"
+                             vehicle-x="[[vehicleX]]"
+                             vehicle-y="[[vehicleY]]"></fsd-dashboard-stats>
       </div>
 
       <div id="settings">
-        <paper-card class="dashboard-box">
-          <div class="card-content">
-            <div class="dashboard-box-header">
-              <iron-icon icon="build"></iron-icon>
-              Settings
-            </div>
-          </div>
-        </paper-card>
+        <!-- Dashboard box settings -->
+        <fsd-dashboard-settings draw-vehicle="{{drawVehicle}}"
+                                draw-track="{{drawTrack}}"
+                                draw-middle-path="{{drawMiddlePath}}"></fsd-dashboard-settings>
       </div>
 
       <div id="other"></div>
@@ -164,29 +132,21 @@ vehicleY: {{vehicleY}}
       static get is() { return 'fsd-map-app'; }
       static get properties() {
         return {
-          steerAngle: {
-            type: Number,
-            value: 0.0
-          },
-          pathMiddleX: {
-            type: Number,
-            value: 0.0
-          },
-          pathMiddleY: {
-            type: Number,
-            value: 0.0
-          },
-          vehicleX: {
-            type: Number,
-            value: 0.0
-          },
-          vehicleY: {
-            type: Number,
-            value: 0.0
-          },
-          ajaxResponse: {
-            type: Object
-          }
+
+          // vehicle data
+          steerAngle: { type: Number, value: 0.0 },
+          pathMiddleX: { type: Number, value: 0.0 },
+          pathMiddleY: { type: Number, value: 0.0 },
+          vehicleX: { type: Number, value: 0.0 },
+          vehicleY: { type: Number, value: 0.0 },
+
+          // networking
+          ajaxResponse: { type: Object },
+
+          // settings
+          drawVehicle: { type: Boolean, value: true },
+          drawTrack: { type: Boolean, value: true },
+          drawMiddlePath: { type: Boolean, value: true }
         };
       }
 
