@@ -1,0 +1,30 @@
+<dom-module id="fsd-map-converter">
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class fsdMapConverter extends Polymer.Element {
+      static get is() {
+        return 'fsd-map-converter';
+      }
+
+      static get properties() {
+        return {
+          pxPerMeter: {
+            type: Number,
+            value: 20
+          }
+        };
+      }
+
+      meterToPixels (m) {
+        return Math.round(m * this.pxPerMeter);
+      }
+
+    }
+
+    window.customElements.define(fsdMapConverter.is, fsdMapConverter);
+  </script>
+</dom-module>

@@ -1,5 +1,7 @@
 <link rel="import" href="./fsd-map-imports.html">
 
+<link rel="import" href="fsd-map-converter.html">
+
 <dom-module id="fsd-map">
   <template>
     <style>
@@ -27,15 +29,22 @@
 
       static get properties() {
         return {
-          // Lifecycle check
+          // Program logic internals
           componentReady: { type: Boolean, value: false },
+          converter: { type: Object },
 
-          // vehicle data
+          // raw vehicle data
           steerAngle: { type: Number, value: 0.0 },
           pathMiddleX: { type: Number, value: 0.0 },
           pathMiddleY: { type: Number, value: 0.0 },
           vehicleX: { type: Number, value: 0.0 },
           vehicleY: { type: Number, value: 0.0 },
+
+          // transformed vehicle data
+          __pathMiddleX: { type: Number, computed: '_transformMeter(pathMiddleX)' },
+          __pathMiddleY: { type: Number, computed: '_transformMeter(pathMiddleY)' },
+          __vehicleX: { type: Number, computed: '_transformMeter(vehicleX)' },
+          __vehicleY: { type: Number, computed: '_transformMeter(vehicleY)' },
 
           // render objects
           twoApp: { type: Object },
@@ -62,6 +71,9 @@
       ready() {
         super.ready();
 
+        // Initialise converter component
+        this.converter = new fsdMapConverter();
+
         // Initialise Two.js app
         var canvas = this.shadowRoot.querySelector('#canvas');
         this.twoApp = new Two({
@@ -69,19 +81,22 @@
           height: 500
         }).appendTo(canvas);
 
+        // draw middle path
+        let anchor = new Two.Anchor(0, 0);
+        this.shapeMiddlePath = this.twoApp.makePath([anchor], true);
+        this.shapeMiddlePath.noFill();
+        this.shapeMiddlePath.stroke = '#323232';
+        this.shapeMiddlePath.linewidth = 60;
+
+        // draw vehicle track
+        this.shapeTrack = this.twoApp.makePath([anchor], true);
+        this.shapeTrack.noFill();
+        this.shapeTrack.stroke = '#ffffff';
+        this.shapeTrack.linewidth = 4;
+
         // draw vehicle
         this.shapeVehicle = this.twoApp.makeCircle(0, 0, 4);
         this.shapeVehicle.fill = '#ff0000';
-
-        // draw vehicle track
-        let anchor = new Two.Anchor(0, 0);
-        this.shapeTrack = this.twoApp.makePath([anchor], true);
-        this.shapeTrack.noFill();
-
-        // draw middle path
-        this.shapeMiddlePath = this.twoApp.makePath([anchor], true);
-        this.shapeMiddlePath.noFill();
-        this.shapeMiddlePath.stroke = '#0000ff';
 
         // add zoomable UI
         this.zui = new ZUI(this.twoApp);
@@ -103,13 +118,13 @@
 
         // move vehicle
         if (this.shapeVehicle) {
-          this.shapeVehicle.translation.x = this.vehicleX;
-          this.shapeVehicle.translation.y = this.vehicleY;
+          this.shapeVehicle.translation.x = this.__vehicleX;
+          this.shapeVehicle.translation.y = this.__vehicleY;
         }
 
         // draw vehicle track
         if (this.shapeTrack) {
-          let anchor = new Two.Anchor(this.vehicleX, this.vehicleY);
+          let anchor = new Two.Anchor(this.__vehicleX, this.__vehicleY);
           this.shapeTrack.vertices.push(anchor);
 
           // when second vertex is added, remove origin
@@ -123,7 +138,7 @@
 
         // draw middle path
         if (this.shapeMiddlePath) {
-          let anchor = new Two.Anchor(this.pathMiddleX, this.pathMiddleY);
+          let anchor = new Two.Anchor(this.__pathMiddleX, this.__pathMiddleY);
           this.shapeMiddlePath.vertices.push(anchor);
 
           // when second vertex is added, remove origin
@@ -174,6 +189,10 @@
         if (this.shapeMiddlePath) {
           this.shapeMiddlePath.opacity = (showMiddlePath) ? 1 : 0;
         }
+      }
+
+      _transformMeter (m) {
+        return (this.converter) ? this.converter.meterToPixels(m) : 0.0;
       }
     }
 
