@@ -3,7 +3,6 @@
 <!-- Layout imports -->
 <link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 
 <!-- App logic -->
@@ -19,6 +18,7 @@
 <link rel="import" href="../../bower_components/iron-image/iron-image.html">
 
 <!-- Custom components -->
+<link rel="import" href="../fsd-shared/fsd-shared-imports.html">
 <link rel="import" href="../fsd-shared/fsd-shared-styles.html">
 <link rel="import" href="../fsd-map/fsd-map.html">
 <link rel="import" href="../fsd-dashboard/fsd-dashboard-stats.html">
@@ -101,7 +101,8 @@
                  vehicle-y="[[vehicleY]]"
                  show-vehicle="[[showVehicle]]"
                  show-track="[[showTrack]]"
-                 show-middle-path="[[showMiddlePath]]"></fsd-map>
+                 show-middle-path="[[showMiddlePath]]"
+                 focus-vehicle="{{focusVehicle}}"></fsd-map>
       </div>
 
       <!-- 2nd row -->
@@ -119,7 +120,8 @@
         <!-- Dashboard box settings -->
         <fsd-dashboard-settings show-vehicle="{{showVehicle}}"
                                 show-track="{{showTrack}}"
-                                show-middle-path="{{showMiddlePath}}"></fsd-dashboard-settings>
+                                show-middle-path="{{showMiddlePath}}"
+                                focus-vehicle="{{focusVehicle}}"></fsd-dashboard-settings>
       </div>
 
       <div id="other"></div>
@@ -149,7 +151,8 @@
           // settings
           showVehicle: { type: Boolean, value: true },
           showTrack: { type: Boolean, value: true },
-          showMiddlePath: { type: Boolean, value: true }
+          showMiddlePath: { type: Boolean, value: true },
+          focusVehicle: { type: Boolean, value: true }
         };
       }
 

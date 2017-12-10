@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 
+<link rel="import" href="../fsd-shared/fsd-shared-imports.html">
 <link rel="import" href="../fsd-shared/fsd-shared-styles.html">
 <link rel="import" href="./fsd-dashboard-imports.html">
 <link rel="import" href="./fsd-dashboard-shared-styles.html">
@@ -7,12 +9,29 @@
 <dom-module id="fsd-dashboard-settings">
   <template>
     <style include="fsd-shared-styles"></style>
+    <style include="app-grid-style"></style>
     <style include="fsd-dashboard-shared-styles">
+
+      :host {
+
+        /* Grid config */
+        --app-grid-columns: 2;
+        --app-grid-gutter: 5px;
+
+      }
 
       paper-checkbox {
         --paper-checkbox-label-color: var(--app-lighttext-color);
         --paper-checkbox-unchecked-color: var(--app-lighttext-color);
         --paper-checkbox-checked-color: var(--app-highlight-color);
+      }
+
+      paper-toggle-button {
+        --paper-toggle-button-label-color: var(--app-lighttext-color);
+        --paper-toggle-button-checked-button-color: var(--app-highlight-color);
+        --paper-toggle-button-checked-ink-color: var(--app-lighttext-color);
+        --paper-toggle-button-checked-bar-color: var(--app-highlight-dark-color);
+        --paper-toggle-button-unchecked-ink-color: var(--app-lighttext-color);
       }
 
     </style>
@@ -23,15 +42,24 @@
           <iron-icon icon="build"></iron-icon>
           Settings
         </div>
-        <p>
-          <paper-checkbox checked="{{showVehicle}}">Show vehicle</paper-checkbox>
-        </p>
-        <p>
-          <paper-checkbox checked="{{showTrack}}">Show driven track</paper-checkbox>
-        </p>
-        <p>
-          <paper-checkbox checked="{{showMiddlePath}}">Show middle path</paper-checkbox>
-        </p>
+        <div class="app-grid">
+          <div>
+            <p>
+              <paper-checkbox checked="{{showVehicle}}">Show vehicle</paper-checkbox>
+            </p>
+            <p>
+              <paper-checkbox checked="{{showTrack}}">Show driven track</paper-checkbox>
+            </p>
+            <p>
+              <paper-checkbox checked="{{showMiddlePath}}">Show middle path</paper-checkbox>
+            </p>
+          </div>
+          <div>
+            <p>
+              <paper-toggle-button checked="{{focusVehicle}}">Focus vehicle</paper-toggle-button>
+            </p>
+          </div>
+        </div>
       </div>
     </paper-card>
 
@@ -52,7 +80,9 @@
 
           showVehicle: { type: Boolean, notify: true },
           showTrack: { type: Boolean, notify: true },
-          showMiddlePath: { type: Boolean, notify: true }
+          showMiddlePath: { type: Boolean, notify: true },
+
+          focusVehicle: { type: Boolean, notify: true }
 
         };
       }
