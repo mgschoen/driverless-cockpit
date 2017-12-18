@@ -97,7 +97,7 @@
         this.shapeMiddlePath = this.twoApp.makePath([anchor], true);
         this.shapeMiddlePath.noFill();
         this.shapeMiddlePath.stroke = '#323232';
-        this.shapeMiddlePath.linewidth = 60;
+        this.shapeMiddlePath.linewidth = this.converter.meterToPixels(3);
 
         // draw vehicle track
         this.shapeTrack = this.twoApp.makePath([anchor], true);
@@ -108,7 +108,6 @@
         // draw vehicle
         this.shapeVehicle = this.twoApp.interpret(this.shadowRoot.querySelector('#svgCar')).center();
         this.shapeVehicle.fill = '#ffffff';
-        //this.shapeVehicle.opacity = 0.7;
 
         // add zoomable UI
         this.zui = new ZUI(this.twoApp);
@@ -125,7 +124,7 @@
         // start animation loop
         this.twoApp.play();
 
-        // resize listener
+        // add resize listener
         window.addEventListener('resize', function () {
           this.twoApp.width = this.offsetWidth;
         }.bind(this));
