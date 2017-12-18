@@ -15,14 +15,19 @@
       <div class="card-content">
         <div class="dashboard-box-header">
           <iron-icon icon="editor:insert-chart"></iron-icon>
-          Stats
+          Live Stats
         </div>
             <pre>
-steerAngle: {{steerAngle}}
-pathMiddleX: {{pathMiddleX}}
-pathMiddleY: {{pathMiddleY}}
-vehicleX: {{vehicleX}}
-vehicleY: {{vehicleY}}
+steerAngle: [[steerAngle]]
+pathMiddleX: [[pathMiddleX]]
+pathMiddleY: [[pathMiddleY]]
+vehicleX: [[vehicleX]]
+vehicleY: [[vehicleY]]
+vehicleVelocityX: [[vehicleVelocityX]]
+vehicleVelocityY: [[vehicleVelocityY]]
+vehicleRotation: [[vehicleRotation]]
+frontwheelLeftRotation: [[frontwheelLeftRotation]]
+frontwheelRightRotation: [[frontwheelRightRotation]]
           </pre>
       </div>
     </paper-card>
@@ -40,12 +45,7 @@ vehicleY: {{vehicleY}}
       }
 
       static get properties() {
-        return {
-          prop1: {
-            type: Number,
-            value: 0.0
-          }
-        };
+        return {};
       }
 
       // class methods go here
