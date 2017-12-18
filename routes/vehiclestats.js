@@ -8,7 +8,12 @@ router.get('/', function(req, res, next) {
     pathMiddleX: vehicle.pathMiddleX,
     pathMiddleY: vehicle.pathMiddleY,
     vehicleX: vehicle.vehicleX,
-    vehicleY: vehicle.vehicleY
+    vehicleY: vehicle.vehicleY,
+    vehicleVelocityX: vehicle.vehicleVelocityX,
+    vehicleVelocityY: vehicle.vehicleVelocityY,
+    vehicleRotation: vehicle.vehicleRotation,
+    frontwheelLeftRotation: vehicle.frontwheelLeftRotation,
+    frontwheelRightRotation: vehicle.frontwheelRightRotation
   });
 });
 

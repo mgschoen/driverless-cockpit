@@ -16,6 +16,11 @@ class VehicleMock {
         this.pathMiddleY = 0;
         this.vehicleX = 0;
         this.vehicleY = 0;
+        this.vehicleVelocityX = 0;
+        this.vehicleVelocityY = 0;
+        this.vehicleRotation = 0;
+        this.frontwheelLeftRotation = 0;
+        this.frontwheelRightRotation = 0;
 
         try {
             this.lineReader = new readline(this.sourcePath);
@@ -38,6 +43,11 @@ class VehicleMock {
         this.pathMiddleY = parseFloat(dataArray[3]);
         this.vehicleX = parseFloat(dataArray[4]);
         this.vehicleY = parseFloat(dataArray[5]);
+        this.vehicleVelocityX = parseFloat(dataArray[6]);
+        this.vehicleVelocityY = parseFloat(dataArray[7]);
+        this.vehicleRotation = parseFloat(dataArray[8]);
+        this.frontwheelLeftRotation = parseFloat(dataArray[9]);
+        this.frontwheelRightRotation = parseFloat(dataArray[10]);
         setTimeout(() => {
             this.nextLine();
         }, 100);
