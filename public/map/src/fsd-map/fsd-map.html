@@ -39,7 +39,7 @@
         return {
           // Program logic internals
           componentReady: { type: Boolean, value: false },
-          converter: { type: Object },
+          converter: Object,
 
           // raw vehicle data
           steerAngle: { type: Number, value: 0.0 },
@@ -55,22 +55,30 @@
           __vehicleY: { type: Number, computed: '_transformMeter(vehicleY)' },
 
           // render objects
-          twoApp: { type: Object },
-          zui: { type: Object },
-          shapeVehicle: { type: Object },
-          shapeTrack: { type: Object },
-          shapeMiddlePath: { type: Object },
+          stage: Object,
+          baseLayer: Object,
+          shapeVehicle: Object,
+          shapeTrack: Object,
+          shapeMiddlePath: Object,
 
-          // view controls
+          // animations
+          animationStage: Object,
+          animationVehicle: Object,
+          animationTrack: Object,
+          animationMiddlePath: Object,
+
+          // view parameters
           dragActive: { type: Boolean, value: false },
           __dragListenerFunction: { type: Object },
           zoomStep: { type: Number, value: 1.1, readOnly: true },
           minZoomScale: { type: Number, value: 0.15, readOnly: true},
           maxZoomScale: { type: Number, value: 5.0, readOnly: true },
+
+          // view controls
           showVehicle: { type: Boolean },
           showTrack: { type: Boolean },
           showMiddlePath: { type: Boolean },
-          focusVehicle: { type: Boolean }
+          focusVehicle: { type: Boolean, observer: '_focusVehicleChanged' }
         };
       }
 
@@ -134,11 +142,15 @@
         this.animationMiddlePath = new Konva.Animation(this._animateMiddlePath.bind(this), this.baseLayer);
         this.animationTrack = new Konva.Animation(this._animateTrack.bind(this), this.baseLayer);
         this.animationVehicle = new Konva.Animation(this._animateVehicle.bind(this), this.baseLayer);
+        this.animationStage = new Konva.Animation(this._animateStage.bind(this), this.baseLayer);
 
         // start animations
         this.animationMiddlePath.start();
         this.animationTrack.start();
         this.animationVehicle.start();
+        if (this.focusVehicle) {
+          this.animationStage.start();
+        }
 
         // initialise zoom
         this.stage.attrs.container.addEventListener('mousewheel', this._performZoom.bind(this));
@@ -226,26 +238,6 @@
         return (this.converter) ? this.converter.meterToPixels(m) : 0.0;
       }
 
-      updateView () {
-        /*
-
-         // if vehicle focus on, move camera
-         if (this.focusVehicle) {
-         let scale = this.zui.scale;
-         let canvas = new Two.Vector(this.twoApp.width, this.twoApp.height);
-         let absoluteCarpos = this.shapeVehicle.translation;
-         let onscreenCarpos = new Two.Vector(absoluteCarpos.x * scale, absoluteCarpos.y * scale);
-         let camTranslation = this.zui.surfaces[0].object.translation;
-         let onscreenCampos = new Two.Vector(-camTranslation.x, -camTranslation.y);
-         let onscreenCamFocus = new Two.Vector(onscreenCampos.x + canvas.x/2,
-         onscreenCampos.y + canvas.y/2);
-         let onscreenDist = new Two.Vector(onscreenCarpos.x - onscreenCamFocus.x,
-         onscreenCarpos.y - onscreenCamFocus.y);
-         this.zui.translateSurface(-onscreenDist.x, -onscreenDist.y);
-         this.zui.updateSurface();
-         } */
-      }
-
       _animateMiddlePath () {
         let points = this.shapeMiddlePath.points();
         let last = {x: points[points.length - 2], y: points[points.length - 1] };
@@ -287,6 +279,30 @@
             let degree = Math.acos(cosine) * (180 / Math.PI);
             this.shapeVehicle.rotation((dir.y >= 0) ? degree : (360 - degree));
           }
+        }
+      }
+
+      _focusVehicleChanged (focusVehicle) {
+        if (this.animationStage) {
+          if (focusVehicle) {
+            this.animationStage.start();
+          } else {
+            this.animationStage.stop();
+          }
+        }
+      }
+
+      _animateStage () {
+        if (this.stage && this.shapeVehicle) {
+          let scale = this.stage.scaleX();
+          let canvas = { x: this.stage.width(), y: this.stage.height() };
+          let absoluteCarpos   = { x: this.shapeVehicle.x(), y: this.shapeVehicle.y() };
+          let onscreenCarpos   = { x: absoluteCarpos.x * scale, y: absoluteCarpos.y * scale };
+          let camTranslation   = { x: this.stage.x(), y: this.stage.y() };
+          let onscreenCampos   = { x: -camTranslation.x, y: -camTranslation.y };
+          let onscreenCamFocus = { x: onscreenCampos.x + canvas.x/2, y: onscreenCampos.y + canvas.y/2 };
+          let onscreenDist     = { x: onscreenCarpos.x - onscreenCamFocus.x, y: onscreenCarpos.y - onscreenCamFocus.y };
+          this.stage.move({ x: -onscreenDist.x, y: -onscreenDist.y });
         }
       }
     }

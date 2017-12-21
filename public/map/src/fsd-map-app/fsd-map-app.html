@@ -206,7 +206,6 @@
           this.frontwheelRightRotation = res.frontwheelRightRotation;
 
           var root = this.shadowRoot;
-          root.querySelector('fsd-map').updateView();
           setTimeout(function(){
             root.querySelector('#vehiclestatsRequest').generateRequest();
           }, 100)
