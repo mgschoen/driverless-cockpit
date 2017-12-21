@@ -64,6 +64,9 @@
           // view controls
           dragActive: { type: Boolean, value: false },
           __dragListenerFunction: { type: Object },
+          zoomStep: { type: Number, value: 1.1, readOnly: true },
+          minZoomScale: { type: Number, value: 0.15, readOnly: true},
+          maxZoomScale: { type: Number, value: 5.0, readOnly: true },
           showVehicle: { type: Boolean },
           showTrack: { type: Boolean },
           showMiddlePath: { type: Boolean },
@@ -83,159 +86,208 @@
         // Initialise converter component
         this.converter = new fsdMapConverter();
 
-        // Initialise Two.js app
+        // Initialise Konva app
         var canvas = this.shadowRoot.querySelector('#canvas');
-        this.twoApp = new Two({
+        this.stage = new Konva.Stage({
+          container: canvas,
           width: this.offsetWidth,
           height: 500
-        }).appendTo(canvas);
+        });
+
+        // create base layer
+        this.baseLayer = new Konva.Layer();
+        this.stage.add(this.baseLayer);
 
         // draw middle path
-        let anchor = new Two.Anchor(0, 0);
-        this.shapeMiddlePath = this.twoApp.makePath([anchor], true);
-        this.shapeMiddlePath.noFill();
-        this.shapeMiddlePath.stroke = '#323232';
-        this.shapeMiddlePath.linewidth = this.converter.meterToPixels(3);
+        this.shapeMiddlePath = new Konva.Line({
+          points: [],
+          stroke: '#323232',
+          strokeWidth: this.converter.meterToPixels(3)
+        });
+        this.baseLayer.add(this.shapeMiddlePath);
 
         // draw vehicle track
-        this.shapeTrack = this.twoApp.makePath([anchor], true);
-        this.shapeTrack.noFill();
-        this.shapeTrack.stroke = '#ffffff';
-        this.shapeTrack.linewidth = 4;
+        this.shapeTrack = new Konva.Line({
+          points: [],
+          stroke: '#ffffff',
+          strokeWidth: 4
+        });
+        this.baseLayer.add(this.shapeTrack);
 
         // draw vehicle
-        this.shapeVehicle = this.twoApp.interpret(this.shadowRoot.querySelector('#svgCar')).center();
-        this.shapeVehicle.scale = 0.2;
-        this.shapeVehicle.opacity = 0.7;
+        var vehicleImage = new Image();
+        vehicleImage.onload = function () {
+          this.shapeVehicle = new Konva.Image({
+            x: 200,
+            y: 50,
+            image: vehicleImage,
+            width: this.converter.meterToPixels(2.925),
+            height: this.converter.meterToPixels(1.395),
+            offsetX: this.converter.meterToPixels(2.925) / 2,
+            offsetY: this.converter.meterToPixels(1.395) / 2
+          });
+          this.baseLayer.add(this.shapeVehicle);
+        }.bind(this);
+        vehicleImage.src = '/static/pwd.png';
 
-        // add zoomable UI
-        this.zui = new ZUI(this.twoApp);
-        this.zui.addLimits(0.06, 8);
-        this.twoApp.renderer.domElement.addEventListener('mousewheel', this._performZoom.bind(this));
-        this.twoApp.renderer.domElement.addEventListener('wheel', this._performZoom.bind(this));
+        // add animations
+        this.animationMiddlePath = new Konva.Animation(this._animateMiddlePath.bind(this), this.baseLayer);
+        this.animationTrack = new Konva.Animation(this._animateTrack.bind(this), this.baseLayer);
+        this.animationVehicle = new Konva.Animation(this._animateVehicle.bind(this), this.baseLayer);
+
+        // start animations
+        this.animationMiddlePath.start();
+        this.animationTrack.start();
+        this.animationVehicle.start();
+
+        // initialise zoom
+        this.stage.attrs.container.addEventListener('mousewheel', this._performZoom.bind(this));
+        this.stage.attrs.container.addEventListener('wheel', this._performZoom.bind(this));
 
         // add drag listeners
-        this.twoApp.renderer.domElement.addEventListener('mousedown', this._startDrag.bind(this));
-        this.twoApp.renderer.domElement.addEventListener('mouseup', this._stopDrag.bind(this));
-        this.twoApp.renderer.domElement.addEventListener('mouseleave', this._stopDrag.bind(this));
+        this.stage.attrs.container.addEventListener('mousedown', this._startDrag.bind(this));
+        this.stage.attrs.container.addEventListener('mouseup', this._stopDrag.bind(this));
+        this.stage.attrs.container.addEventListener('mouseleave', this._stopDrag.bind(this));
         this.__dragListenerFunction = this._dragStep.bind(this);
-
-        // start animation loop
-        this.twoApp.play();
 
         // add resize listener
         window.addEventListener('resize', function () {
-          this.twoApp.width = this.offsetWidth;
+          this.stage.width(this.offsetWidth);
         }.bind(this));
-      }
-
-      updateView () {
-
-        // draw vehicle track
-        if (this.shapeTrack) {
-          let anchor = new Two.Anchor(this.__vehicleX, this.__vehicleY);
-          this.shapeTrack.vertices.push(anchor);
-
-          // when second vertex is added, remove origin
-          if (this.shapeTrack.vertices.length === 2) {
-            var firstVertex = this.shapeTrack.vertices[0];
-            if (firstVertex.x === 0 && firstVertex.y === 0) {
-              this.shapeTrack.vertices.shift();
-            }
-          }
-        }
-
-        // draw middle path
-        if (this.shapeMiddlePath) {
-          let anchor = new Two.Anchor(this.__pathMiddleX, this.__pathMiddleY);
-          this.shapeMiddlePath.vertices.push(anchor);
-
-          // when second vertex is added, remove origin
-          if (this.shapeMiddlePath.vertices.length === 2) {
-            var firstVertex = this.shapeMiddlePath.vertices[0];
-            if (firstVertex.x === 0 && firstVertex.y === 0) {
-              this.shapeMiddlePath.vertices.shift();
-            }
-          }
-        }
-
-        // move vehicle
-        if (this.shapeVehicle) {
-          this.shapeVehicle.translation.x = this.__vehicleX;
-          this.shapeVehicle.translation.y = this.__vehicleY;
-        }
-
-        // rotate vehicle
-        let numVertices = this.shapeTrack.vertices.length;
-        if (numVertices > 2) {
-          let next2Last = this.shapeTrack.vertices[numVertices-2];
-          let last = this.shapeTrack.vertices[numVertices-1];
-          let dir = new Two.Vector(last.x - next2Last.x, last.y - next2Last.y);
-          let dirLength = Math.sqrt(Math.pow(dir.x,2) + Math.pow(dir.y,2));
-          let cosine = dir.x / dirLength;
-          let radiant = Math.acos(cosine);
-          this.shapeVehicle.rotation = (dir.y >= 0) ? radiant : (2 * Math.PI - radiant);
-        }
-
-        // if vehicle focus on, move camera
-        if (this.focusVehicle) {
-          let scale = this.zui.scale;
-          let canvas = new Two.Vector(this.twoApp.width, this.twoApp.height);
-          let absoluteCarpos = this.shapeVehicle.translation;
-          let onscreenCarpos = new Two.Vector(absoluteCarpos.x * scale, absoluteCarpos.y * scale);
-          let camTranslation = this.zui.surfaces[0].object.translation;
-          let onscreenCampos = new Two.Vector(-camTranslation.x, -camTranslation.y);
-          let onscreenCamFocus = new Two.Vector(onscreenCampos.x + canvas.x/2,
-                                                onscreenCampos.y + canvas.y/2);
-          let onscreenDist = new Two.Vector(onscreenCarpos.x - onscreenCamFocus.x,
-                                            onscreenCarpos.y - onscreenCamFocus.y);
-          this.zui.translateSurface(-onscreenDist.x, -onscreenDist.y);
-          this.zui.updateSurface();
-        }
       }
 
       _performZoom (e) {
         e.stopPropagation();
         e.preventDefault();
 
-        var dy = (e.wheelDeltaY || -e.deltaY) / 1000;
+        // gather parameters
+        let oldScale = this.stage.scaleX();
+        let mouseTarget = {
+          x: this.stage.getPointerPosition().x / oldScale - this.stage.x() / oldScale,
+          y: this.stage.getPointerPosition().y / oldScale - this.stage.y() / oldScale
+        };
 
-        this.zui.zoomBy(dy, e.clientX, e.clientY);
+        // scale stage
+        let delta = e.wheelDeltaY || -e.deltaY;
+        let computedScale = delta > 0 ? oldScale * this.zoomStep : oldScale / this.zoomStep;
+        let newScale =
+                (computedScale < this.minZoomScale) ? this.minZoomScale :
+                (computedScale > this.maxZoomScale) ? this.maxZoomScale :
+                computedScale;
+        this.stage.scale({ x: newScale, y:  newScale});
+
+        // move stage to mouse position
+        let newPos = {
+          x: -(mouseTarget.x - this.stage.getPointerPosition().x / newScale) * newScale,
+          y: -(mouseTarget.y - this.stage.getPointerPosition().y / newScale) * newScale
+        };
+        this.stage.position(newPos);
+        this.stage.batchDraw();
       }
 
       _startDrag (e) {
         if (!this.dragActive) {
           this.dragActive = true;
-          this.twoApp.renderer.domElement.addEventListener('mousemove', this.__dragListenerFunction);
+          this.stage.attrs.container.addEventListener('mousemove', this.__dragListenerFunction);
         }
       }
 
       _stopDrag (e) {
         if (this.dragActive) {
           this.dragActive = false;
-          this.twoApp.renderer.domElement.removeEventListener('mousemove', this.__dragListenerFunction);
+          this.stage.attrs.container.removeEventListener('mousemove', this.__dragListenerFunction);
         }
       }
 
       _dragStep (e) {
-        this.zui.translateSurface(e.movementX, e.movementY);
-        this.zui.updateSurface();
+        this.stage.move({ x: e.movementX, y: e.movementY });
+        this.stage.batchDraw();
       }
 
       _showParametersChanged (showVehicle, showTrack, showMiddlePath) {
         if (this.shapeVehicle) {
-          this.shapeVehicle.opacity = (showVehicle) ? 1 : 0;
+          showVehicle
+                  ? this.shapeVehicle.show()
+                  : this.shapeVehicle.hide();
         }
         if (this.shapeTrack) {
-          this.shapeTrack.opacity = (showTrack) ? 1 : 0;
+          showTrack
+                  ? this.shapeTrack.show()
+                  : this.shapeTrack.hide();
         }
         if (this.shapeMiddlePath) {
-          this.shapeMiddlePath.opacity = (showMiddlePath) ? 1 : 0;
+          showMiddlePath
+                  ? this.shapeMiddlePath.show()
+                  : this.shapeMiddlePath.hide();
         }
       }
 
       _transformMeter (m) {
         return (this.converter) ? this.converter.meterToPixels(m) : 0.0;
+      }
+
+      updateView () {
+        /*
+
+         // if vehicle focus on, move camera
+         if (this.focusVehicle) {
+         let scale = this.zui.scale;
+         let canvas = new Two.Vector(this.twoApp.width, this.twoApp.height);
+         let absoluteCarpos = this.shapeVehicle.translation;
+         let onscreenCarpos = new Two.Vector(absoluteCarpos.x * scale, absoluteCarpos.y * scale);
+         let camTranslation = this.zui.surfaces[0].object.translation;
+         let onscreenCampos = new Two.Vector(-camTranslation.x, -camTranslation.y);
+         let onscreenCamFocus = new Two.Vector(onscreenCampos.x + canvas.x/2,
+         onscreenCampos.y + canvas.y/2);
+         let onscreenDist = new Two.Vector(onscreenCarpos.x - onscreenCamFocus.x,
+         onscreenCarpos.y - onscreenCamFocus.y);
+         this.zui.translateSurface(-onscreenDist.x, -onscreenDist.y);
+         this.zui.updateSurface();
+         } */
+      }
+
+      _animateMiddlePath () {
+        let points = this.shapeMiddlePath.points();
+        let last = {x: points[points.length - 2], y: points[points.length - 1] };
+        if (this.__pathMiddleX != last.x || this.__pathMiddleX != last.y) {
+          this.shapeMiddlePath.points(points.concat([this.__pathMiddleX, this.__pathMiddleY]));
+        }
+      }
+
+      _animateTrack () {
+        let points = this.shapeTrack.points();
+        let last = {x: points[points.length - 2], y: points[points.length - 1] };
+        if (this.__vehicleX != last.x || this.__vehicleY != last.y) {
+          this.shapeTrack.points(points.concat([this.__vehicleX, this.__vehicleY]));
+        }
+      }
+
+      _animateVehicle () {
+
+        if (this.shapeVehicle) {
+          this.shapeVehicle.x(this.__vehicleX);
+          this.shapeVehicle.y(this.__vehicleY);
+
+          let points = this.shapeTrack.points();
+          if (points.length >= 4) {
+            let next2Last = {
+              x: points[points.length - 4],
+              y: points[points.length - 3]
+            };
+            let last = {
+              x: points[points.length - 2],
+              y: points[points.length - 1]
+            };
+            let dir = {
+              x: last.x - next2Last.x,
+              y: last.y - next2Last.y
+            };
+            let dirLength = Math.sqrt(Math.pow(dir.x,2) + Math.pow(dir.y,2));
+            let cosine = dir.x / dirLength;
+            let degree = Math.acos(cosine) * (180 / Math.PI);
+            this.shapeVehicle.rotation((dir.y >= 0) ? degree : (360 - degree));
+          }
+        }
       }
     }
 
