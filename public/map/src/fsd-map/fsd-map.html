@@ -152,10 +152,13 @@
         this.stage.attrs.container.addEventListener('mouseleave', this._stopDrag.bind(this));
         this.__dragListenerFunction = this._dragStep.bind(this);
 
-        // add resize listener
-        window.addEventListener('resize', function () {
-          this.stage.width(this.offsetWidth);
-        }.bind(this));
+        // initialise canvas resizing
+        window.addEventListener('load', this._resizeCanvas.bind(this));
+        window.addEventListener('resize', this._resizeCanvas.bind(this));
+      }
+
+      _resizeCanvas () {
+        this.stage.width(this.offsetWidth);
       }
 
       _performZoom (e) {
@@ -233,7 +236,7 @@
         let last = {x: points[points.length - 2], y: points[points.length - 1] };
         if (this.__pathMiddleX != last.x || this.__pathMiddleX != last.y) {
           if (points.length >= 2 && points[0] == 0 && points[1] == 0) {
-            points.shift(); points.shift(); console.log('Removed origin from middle path');
+            points.shift(); points.shift();
           }
           this.shapeMiddlePath.points(points.concat([this.__pathMiddleX, this.__pathMiddleY]));
         }
@@ -244,7 +247,7 @@
         let last = {x: points[points.length - 2], y: points[points.length - 1] };
         if (this.__vehicleX != last.x || this.__vehicleY != last.y) {
           if (points.length >= 2 && points[0] == 0 && points[1] == 0) {
-            points.shift(); points.shift(); console.log('Removed origin from track');
+            points.shift(); points.shift();
           }
           this.shapeTrack.points(points.concat([this.__vehicleX, this.__vehicleY]));
         }
